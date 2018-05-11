@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue todo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
+    <style>
+        .float-left {
+            float: left;
+        }
+        .float-right {
+            float: right;
+        }
+        .w-100 {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui container" id="app">
+        <div class="ui clearing">
+            <h3 class="ui heading" style="text-align:center">VUE JS TODO LIST</h3>
+        </div>
+        <form class="ui form" v-on:submit.prevent="addTodo(input)" v-on:keydown="removeErrors()">
+            <div v-bind:class="{field: isActive, 'field error': isErrActive }">
+                <label>todo</label>
+                <input type="text" name="first-name" placeholder="todo list" v-model="input" autocomplete="off">
+                <div v-show="isErrActive" class="ui pointing red basic label">
+                    Please enter a value
+                </div>
+
+            </div>
+            <button class="fluid ui primary button" type="submit">Submit</button>
+        </form>
+        <div class="ui ignored warning message" v-show="listExist">
+            List Already exist in the queue
+        </div>
+        <div class="ui ignored success message" v-show="updateSuccess">
+            item successfully updated
+        </div>
+        <div class="ui ignored success message" v-show="deleteSuccess">
+            item successfully deleted
+        </div>
+
+        <div class="ui stacked segment float-left w-100" v-for="(todolist,index) in todo" v-bind:key="index">
+          <div class="content">{{todolist}} 
+              <i class="window close outline red large icon float-right" v-on:click="deleteThis(index)"></i>
+              <i class="edit green icon float-right" v-on:click="editTodo(index)" v-show="editEnabled"></i>
+              <div class="ui form float-right" v-show="isUpdate" >
+                  <div class="inline field">
+                    <input type="text" name="" id="" v-model="update" class="float-left" >
+                    <button type="submit" class="ui small yellow button float-right" v-on:click="updateTodo(index)">Update</button>
+                  </div>
+              </div>   
+        </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                todo: [],
+                input: '',
+                isActive: true,
+                isErrActive: false,
+                listExist: false,
+                isUpdate: false,
+                editEnabled: true,
+                update: '',
+                updateSuccess: false,
+                deleteSuccess: false
+            },
+            methods: {
+                addTodo: function(userinput) {
+                    if(!userinput) {
+                        this.isActive = false,
+                        this.isErrActive = true;
+                        return false;
+                    }
+                    for(var i= 0; i<=this.todo.length-1; i++) {
+                        if(this.todo[i] == userinput.trim()) {
+                            this.listExist = true;
+                            return false;
+                        }
+                    }
+                        this.todo.unshift(userinput);
+                        this.input = '';
+                
+                },
+                removeErrors: function() {
+                    this.isActive= true;
+                    this.isErrActive = false;
+                    this.listExist = false;
+                    this.deleteSuccess = false;
+                    this.updateSuccess = false;
+                },
+                deleteThis: function(index) {
+                    this.todo.splice(index,1);
+                    this.deleteSuccess =true;
+                    this.updateSuccess = false;
+                },
+                editTodo: function(index) {
+                    this.isUpdate = true;
+                    this.editEnabled = false;
+                    this.update = this.todo[index];
+                },
+                updateTodo: function(index) {
+                    this.todo.splice(index,1,this.update);
+                    this.updateSuccess = true;
+                    this.isUpdate = false;
+                    this.editEnabled = true;
+                    this.deleteSuccess = false;
+                } 
+            }
+        });
+    </script>
+</body>
+</html>
